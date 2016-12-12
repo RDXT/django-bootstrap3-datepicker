@@ -2,6 +2,7 @@
 import re
 
 from django.forms import DateInput
+from django.forms.utils import flatatt
 from django.utils.formats import get_format
 from django.utils.html import format_html
 from django.utils.translation import get_language
@@ -57,7 +58,7 @@ dateConversiontoJavascript = {
 toJavascript_re = re.compile(r'(?<!\w)(' + '|'.join(dateConversiontoJavascript.keys()) + r')\b')
 
 COMPONENT_TEMPLATE = """
-       <div class="input-group date" data-provide="datepicker">
+       <div class="input-group date" data-provide="datepicker" {}>
             {}
             <div class="input-group-addon">
                 <span class="glyphicon {}"></span>
@@ -86,6 +87,7 @@ class B3datepickerMixin(object):
         self.options.setdefault('weekStart', 1)
         self.options.setdefault('calendarWeeks', True)
         self.options.setdefault('clearBtn', False)
+        self.options.setdefault('format', 'dd/mm/yyyy')
 
         if usel10n is True:
             self.is_localized = True
@@ -121,27 +123,22 @@ class B3datepickerMixin(object):
     def render(self, name, value, attrs=None):
         if not self.component_view:
             attrs["data-provide"] = "datepicker"
-
-        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        rendered_widget = super(B3datepickerMixin, self).render(name, value, final_attrs)
-
-        print self.component_view
-        if self.component_view:
-            return format_html(COMPONENT_TEMPLATE, rendered_widget, self.glyphicon)
-
-        return rendered_widget
+            final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+            return super(B3datepickerMixin, self).render(name, value, final_attrs)
+        else:
+            final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+            rendered = super(B3datepickerMixin, self).render(name, value, final_attrs)
+            return format_html(COMPONENT_TEMPLATE, flatatt(final_attrs), rendered, self.glyphicon)
 
 
 class DateWidget(B3datepickerMixin, DateInput):
     format_name = 'DATE_INPUT_FORMATS'
     glyphicon = 'glyphicon-calendar'
 
-    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None):
+    def __init__(self, attrs=None, options=None, component_view=False, usel10n=True):
 
         if options is None:
             options = {}
 
-        # Set the default options to show only the datepicker object
-        options['format'] = options.get('format', 'dd/mm/yyyy')
-
+        component_view = True
         super(DateWidget, self).__init__(attrs, options, component_view, usel10n)
