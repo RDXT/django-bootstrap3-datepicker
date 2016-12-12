@@ -12,7 +12,7 @@ class Settings(object):
     BOOTSTRAP_DATEPICKER_VERSION = '1.6.4'
     B3DATEPICKER_JS = '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{}/js/bootstrap-datepicker.min.js'.format(
         BOOTSTRAP_DATEPICKER_VERSION)
-    B3DATEPICKER_CSS = '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{}/css/bootstrap-datepicker3.standalone.min.css'.format(
+    B3DATEPICKER_CSS = '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{}/css/bootstrap-datepicker3.min.css'.format(
         BOOTSTRAP_DATEPICKER_VERSION)
 
     def __getattribute__(self, name):

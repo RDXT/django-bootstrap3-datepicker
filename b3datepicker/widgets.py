@@ -57,7 +57,7 @@ dateConversiontoJavascript = {
 
 toJavascript_re = re.compile(r'(?<!\w)(' + '|'.join(dateConversiontoJavascript.keys()) + r')\b')
 
-COMPONENT_TEMPLATE = """
+COMPONENT_TEMPLATE = u"""
        <div class="input-group date" data-provide="datepicker" {}>
             {}
             <div class="input-group-addon">
