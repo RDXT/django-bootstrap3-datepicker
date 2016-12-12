@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from django.forms import DateTimeInput, DateInput, TimeInput
+from django.forms import DateInput
 from django.utils.formats import get_format
 from django.utils.html import format_html
 from django.utils.translation import get_language
@@ -70,14 +70,22 @@ class B3datepickerMixin(object):
     format_name = None
     glyphicon = None
 
-    def __init__(self, attrs=None, options=None, component=False, usel10n=None):
-        self.component = component
+    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None):
+        self.component_view = component_view
         self.is_localized = False
         self.format = None
         self.options = options
 
         if self.options is None:
             self.options = {}
+
+        # set some defaults
+        self.options.setdefault('autoclose', True)
+        self.options.setdefault('assumeNearbyYear', True)
+        self.options.setdefault('todayHighlight', True)
+        self.options.setdefault('weekStart', 1)
+        self.options.setdefault('calendarWeeks', True)
+        self.options.setdefault('clearBtn', False)
 
         if usel10n is True:
             self.is_localized = True
@@ -101,86 +109,39 @@ class B3datepickerMixin(object):
         if attrs is None:
             attrs = {}
         for k, v in self.options.items():
-            # We set properties as underscore string
-            underscore = re.sub('([A-Z]+)', r'-\1', k).lower()
+            if isinstance(v, bool):
+                v = {True: 'true', False: 'false'}[v]
+            # set properties
+            pattern = re.sub('([A-Z]+)', r'-\1', k).lower()
             # we convert value to string (mainly for boolean values)
-            attrs["data-date-%s" % underscore] = str(v)
+            attrs["data-date-%s" % pattern] = str(v)
 
         super(B3datepickerMixin, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        if not self.component:
+        if not self.component_view:
             attrs["data-provide"] = "datepicker"
 
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         rendered_widget = super(B3datepickerMixin, self).render(name, value, final_attrs)
 
-        if self.component:
+        print self.component_view
+        if self.component_view:
             return format_html(COMPONENT_TEMPLATE, rendered_widget, self.glyphicon)
 
         return rendered_widget
 
 
-class DateTimeWidget(B3datepickerMixin, DateTimeInput):
-    """
-    DateTimeWidget is the corresponding widget for Datetime field, it renders both the date and time
-    sections of the datetime picker.
-    """
-
-    format_name = 'DATETIME_INPUT_FORMATS'
-    glyphicon = 'glyphicon-th'
-
-    def __init__(self, attrs=None, options=None, usel10n=None):
-
-        if options is None:
-            options = {}
-
-        # Set the default options to show only the datepicker object
-        options['format'] = options.get('format', 'dd/mm/yyyy hh:ii')
-
-        super(DateTimeWidget, self).__init__(attrs, options, usel10n)
-
-
 class DateWidget(B3datepickerMixin, DateInput):
-    """
-    DateWidget is the corresponding widget for Date field, it renders only the date section of
-    datetime picker.
-    """
-
     format_name = 'DATE_INPUT_FORMATS'
     glyphicon = 'glyphicon-calendar'
 
-    def __init__(self, attrs=None, options=None, usel10n=None):
+    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None):
 
         if options is None:
             options = {}
 
         # Set the default options to show only the datepicker object
-        options['startView'] = options.get('startView', 2)
-        options['minView'] = options.get('minView', 2)
         options['format'] = options.get('format', 'dd/mm/yyyy')
 
-        super(DateWidget, self).__init__(attrs, options, usel10n)
-
-
-class TimeWidget(B3datepickerMixin, TimeInput):
-    """
-    TimeWidget is the corresponding widget for Time field, it renders only the time section of
-    datetime picker.
-    """
-
-    format_name = 'TIME_INPUT_FORMATS'
-    glyphicon = 'glyphicon-time'
-
-    def __init__(self, attrs=None, options=None, usel10n=None):
-
-        if options is None:
-            options = {}
-
-        # Set the default options to show only the timepicker object
-        options['startView'] = options.get('startView', 1)
-        options['minView'] = options.get('minView', 0)
-        options['maxView'] = options.get('maxView', 1)
-        options['format'] = options.get('format', 'hh:ii')
-
-        super(TimeWidget, self).__init__(attrs, options, usel10n)
+        super(DateWidget, self).__init__(attrs, options, component_view, usel10n)

@@ -23,7 +23,8 @@ def b3datepicker_js(context):
     js = js_template.format(settings.B3DATEPICKER_JS)
     if language != 'en':
         lang_template = \
-            u"//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/locales/bootstrap-datepicker.{}.min.js".format(
+            u"//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/{}/locales/bootstrap-datepicker.{}.min.js".format(
+                settings.BOOTSTRAP_DATEPICKER_VERSION,
                 language
             )
         js += js_template.format(lang_template)
