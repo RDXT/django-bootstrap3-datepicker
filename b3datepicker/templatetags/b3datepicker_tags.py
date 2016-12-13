@@ -17,7 +17,12 @@ def b3datepicker_css():
 
 @register.simple_tag(takes_context=True)
 def b3datepicker_js(context):
-    lang = context['LANGUAGE_CODE']
+    lang = 'en'
+    for x in context:
+        try:
+            lang = x['LANGUAGE_CODE']
+        except KeyError:
+            pass
     language = get_supported_language(lang)
     js_template = u'<script src="{}" type="text/javascript" charset="utf-8"></script>'
     js = js_template.format(settings.B3DATEPICKER_JS)
