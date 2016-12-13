@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import template
 from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
 
 from b3datepicker.conf import settings
 from b3datepicker.widgets import get_supported_language
@@ -15,14 +16,9 @@ def b3datepicker_css():
     return mark_safe(css)
 
 
-@register.simple_tag(takes_context=True)
-def b3datepicker_js(context):
-    lang = 'en'
-    for x in context:
-        try:
-            lang = x['LANGUAGE_CODE']
-        except KeyError:
-            pass
+@register.simple_tag()
+def b3datepicker_js():
+    lang = get_language()
     language = get_supported_language(lang)
     js_template = u'<script src="{}" type="text/javascript" charset="utf-8"></script>'
     js = js_template.format(settings.B3DATEPICKER_JS)
