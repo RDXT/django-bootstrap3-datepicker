@@ -110,25 +110,31 @@ class B3datepickerMixin(object):
 
         if attrs is None:
             attrs = {}
+
+        self.dp_attrs = {}
+
         for k, v in self.options.items():
             if isinstance(v, bool):
                 v = {True: 'true', False: 'false'}[v]
             # set properties
             pattern = re.sub('([A-Z]+)', r'-\1', k).lower()
             # we convert value to string (mainly for boolean values)
-            attrs["data-date-%s" % pattern] = str(v)
+            self.dp_attrs["data-date-%s" % pattern] = str(v)
 
         super(B3datepickerMixin, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
         if not self.component_view:
             attrs["data-provide"] = "datepicker"
-            final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-            return super(B3datepickerMixin, self).render(name, value, final_attrs)
+            new_attrs = attrs.copy()
+            new_attrs.update(self.dp_attrs)
+            input_attrs = self.build_attrs(new_attrs, type=self.input_type, name=name)
+            return super(B3datepickerMixin, self).render(name, value, input_attrs)
         else:
-            final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-            rendered = super(B3datepickerMixin, self).render(name, value, final_attrs)
-            return format_html(COMPONENT_TEMPLATE, flatatt(final_attrs), rendered, self.glyphicon)
+            input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+            rendered = super(B3datepickerMixin, self).render(name, value, input_attrs)
+            dp_attrs = self.build_attrs(self.dp_attrs, type=self.input_type, name=name)
+            return format_html(COMPONENT_TEMPLATE, flatatt(dp_attrs), rendered, self.glyphicon)
 
 
 class DateWidget(B3datepickerMixin, DateInput):
