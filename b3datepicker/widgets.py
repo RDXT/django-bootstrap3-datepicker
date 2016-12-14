@@ -72,7 +72,7 @@ class DateWidget(DateInput):
     format_name = 'DATE_INPUT_FORMATS'
     glyphicon = 'glyphicon-calendar'
 
-    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None, language=settings.LANGUAGE_CODE):
+    def __init__(self, attrs=None, options=None, component_view=True, usel10n=True, language=settings.LANGUAGE_CODE):
         self.component_view = component_view
         self.is_localized = False
         self.format = None
