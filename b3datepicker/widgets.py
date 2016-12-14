@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
+from django.conf import settings
 from django.forms import DateInput
 from django.forms.utils import flatatt
 from django.utils.formats import get_format
@@ -67,11 +68,11 @@ COMPONENT_TEMPLATE = u"""
        """
 
 
-class B3datepickerMixin(object):
-    format_name = None
-    glyphicon = None
+class DateWidget(DateInput):
+    format_name = 'DATE_INPUT_FORMATS'
+    glyphicon = 'glyphicon-calendar'
 
-    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None):
+    def __init__(self, attrs=None, options=None, component_view=False, usel10n=None, language=settings.LANGUAGE_CODE):
         self.component_view = component_view
         self.is_localized = False
         self.format = None
@@ -89,6 +90,8 @@ class B3datepickerMixin(object):
         self.options.setdefault('clearBtn', False)
         self.options.setdefault('format', 'dd/mm/yyyy')
 
+        self.options['language'] = get_supported_language(language)
+
         if usel10n is True:
             self.is_localized = True
 
@@ -98,9 +101,6 @@ class B3datepickerMixin(object):
                 lambda x: dateConversiontoJavascript[x.group()],
                 self.format
             )
-
-            self.options['language'] = get_supported_language(get_language())
-
         else:
             format = self.options['format']
             self.format = toPython_re.sub(
@@ -111,7 +111,7 @@ class B3datepickerMixin(object):
         if attrs is None:
             attrs = {}
 
-        self.dp_attrs = {}
+        self.dp_attrs = {'data-b3datepicker': "b3datepicker"}
 
         for k, v in self.options.items():
             if isinstance(v, bool):
@@ -121,7 +121,7 @@ class B3datepickerMixin(object):
             # we convert value to string (mainly for boolean values)
             self.dp_attrs["data-date-%s" % pattern] = str(v)
 
-        super(B3datepickerMixin, self).__init__(attrs)
+        super(DateWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
         if not self.component_view:
@@ -129,22 +129,9 @@ class B3datepickerMixin(object):
             new_attrs = attrs.copy()
             new_attrs.update(self.dp_attrs)
             input_attrs = self.build_attrs(new_attrs, type=self.input_type, name=name)
-            return super(B3datepickerMixin, self).render(name, value, input_attrs)
+            return super(DateWidget, self).render(name, value, input_attrs)
         else:
             input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-            rendered = super(B3datepickerMixin, self).render(name, value, input_attrs)
+            rendered = super(DateWidget, self).render(name, value, input_attrs)
             dp_attrs = self.build_attrs(self.dp_attrs, type=self.input_type, name=name)
             return format_html(COMPONENT_TEMPLATE, flatatt(dp_attrs), rendered, self.glyphicon)
-
-
-class DateWidget(B3datepickerMixin, DateInput):
-    format_name = 'DATE_INPUT_FORMATS'
-    glyphicon = 'glyphicon-calendar'
-
-    def __init__(self, attrs=None, options=None, component_view=False, usel10n=True):
-
-        if options is None:
-            options = {}
-
-        component_view = True
-        super(DateWidget, self).__init__(attrs, options, component_view, usel10n)
