@@ -96,7 +96,6 @@ class DateWidget(DateInput):
             self.is_localized = True
 
             self.format = get_format(self.format_name)[0]
-
             self.options['format'] = toJavascript_re.sub(
                 lambda x: dateConversiontoJavascript[x.group()],
                 self.format
@@ -131,6 +130,7 @@ class DateWidget(DateInput):
             input_attrs = self.build_attrs(new_attrs, type=self.input_type, name=name)
             return super(DateWidget, self).render(name, value, input_attrs)
         else:
+            attrs["data-date-format"] = self.options['format']
             input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
             rendered = super(DateWidget, self).render(name, value, input_attrs)
             dp_attrs = self.build_attrs(self.dp_attrs, type=self.input_type, name=name)
