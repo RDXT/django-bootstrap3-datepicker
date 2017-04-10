@@ -123,15 +123,17 @@ class DateWidget(DateInput):
         super(DateWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
+        attrs["type"] = self.input_type
+        attrs["name"] = name
         if not self.component_view:
             attrs["data-provide"] = "datepicker"
             new_attrs = attrs.copy()
             new_attrs.update(self.dp_attrs)
-            input_attrs = self.build_attrs(new_attrs, type=self.input_type, name=name)
+            input_attrs = self.build_attrs(new_attrs)
             return super(DateWidget, self).render(name, value, input_attrs)
         else:
             attrs["data-date-format"] = self.options['format']
-            input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+            input_attrs = self.build_attrs(attrs)
             rendered = super(DateWidget, self).render(name, value, input_attrs)
-            dp_attrs = self.build_attrs(self.dp_attrs, type=self.input_type, name=name)
+            dp_attrs = self.build_attrs(self.dp_attrs)
             return format_html(COMPONENT_TEMPLATE, flatatt(dp_attrs), rendered, self.glyphicon)
